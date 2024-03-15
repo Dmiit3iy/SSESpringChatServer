@@ -4,7 +4,9 @@ import org.dmiit3iy.model.User;
 import org.dmiit3iy.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
@@ -24,9 +26,20 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     @Override
     public User get(long id) {
-        return userRepository.findById(id).orElseThrow(()->new IllegalArgumentException("User does not exists!"));
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User does not exists!"));
+    }
+
+    @Override
+    public User getByLoginAndPassword(String login, String password) {
+        return userRepository.findByLoginAndPassword(login, password).orElseThrow(() -> new IllegalArgumentException("User does not exists!"));
+    }
+
+    @Override
+    public User delete(long id) {
+        User user = get(id);
+        userRepository.deleteById(id);
+        return user;
     }
 }

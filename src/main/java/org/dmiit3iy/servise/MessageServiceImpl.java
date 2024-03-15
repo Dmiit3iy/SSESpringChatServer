@@ -4,9 +4,11 @@ import org.dmiit3iy.model.Message;
 import org.dmiit3iy.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class MessageServiceImpl implements MessageService {
 
     private MessageRepository messageRepository;
@@ -32,6 +34,6 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Message get(long id) {
-        return messageRepository.findById(id).orElseThrow(()->new IllegalArgumentException("Message does not exists!"));
+        return messageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Message does not exists!"));
     }
 }

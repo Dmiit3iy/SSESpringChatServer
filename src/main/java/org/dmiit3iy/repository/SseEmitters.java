@@ -16,7 +16,7 @@ public class SseEmitters {
     private static final Logger logger = LoggerFactory.getLogger(SseEmitters.class);
 
     private static ConcurrentHashMap<Long, CopyOnWriteArrayList<SseEmitter>> map = new ConcurrentHashMap<>();
-    private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
+    //private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     public SseEmitter add(SseEmitter emitter, long idUser) {
         addInMap(emitter, idUser);
@@ -35,7 +35,7 @@ public class SseEmitters {
     }
 
     public void send(Object obj) {
-        logger.info("Emitters current before deleting: {}", this.emitters);
+        logger.info("Emitters current before deleting: {}",getOnlineEmitters());
         List<SseEmitter> failedEmitters = new ArrayList<>();
         CopyOnWriteArrayList<SseEmitter> emittersOnLine = getOnlineEmitters();
         emittersOnLine.forEach(emitter -> {
@@ -53,7 +53,7 @@ public class SseEmitters {
         });
 
 
-        this.emitters.removeAll(failedEmitters);
+     //   this.emitters.removeAll(failedEmitters);
         for (SseEmitter s: failedEmitters) {
             removeByEmitter(s);
         }

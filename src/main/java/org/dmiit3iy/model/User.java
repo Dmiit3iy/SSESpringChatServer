@@ -1,5 +1,6 @@
 package org.dmiit3iy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
 
@@ -26,5 +27,6 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
     @Cascade(value = org.hibernate.annotations.CascadeType.DELETE)
     @ToString.Exclude
+    @JsonIgnore
     List<Message> messageList;
 }
