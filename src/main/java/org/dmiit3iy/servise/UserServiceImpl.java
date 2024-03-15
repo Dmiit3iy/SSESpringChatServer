@@ -1,10 +1,14 @@
 package org.dmiit3iy.servise;
 
 import org.dmiit3iy.model.User;
+import org.dmiit3iy.repository.SseEmitters;
 import org.dmiit3iy.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -14,6 +18,13 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    private SseEmitters sseEmitters;
+
+    @Autowired
+    public void setSseEmitters(SseEmitters sseEmitters) {
+        this.sseEmitters = sseEmitters;
     }
 
     @Override
@@ -41,5 +52,15 @@ public class UserServiceImpl implements UserService {
         User user = get(id);
         userRepository.deleteById(id);
         return user;
+    }
+
+    @Override
+    public List<User> getOnlineUsers() {
+        List<User> userList = new ArrayList<>();
+        List<Long> longList = sseEmitters.getOnlineUsers();
+        for (Long x : longList) {
+            userList.add(get(x));
+        }
+        return userList;
     }
 }
