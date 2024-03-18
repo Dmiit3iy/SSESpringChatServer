@@ -1,5 +1,6 @@
 package org.dmiit3iy.event;
 
+import org.dmiit3iy.model.Message;
 import org.springframework.context.ApplicationEvent;
 
 
@@ -9,7 +10,7 @@ public class MessageEvent extends ApplicationEvent {
 
     private final Event event;
 
-    public MessageEvent(Object source, String user, String message) {
+    public MessageEvent(Object source, String user, Message message) {
         super(source);
         this.event = new Event(user, message);
     }
@@ -21,9 +22,9 @@ public class MessageEvent extends ApplicationEvent {
     public static class Event {
 
         private final String login;
-        private final String message;
+        private final Message message;
 
-        public Event(String user, String message) {
+        public Event(String user, Message message) {
             this.login = user;
             this.message = message;
         }
@@ -32,7 +33,7 @@ public class MessageEvent extends ApplicationEvent {
             return login;
         }
 
-        public String getMessage() {
+        public Message getMessage() {
             return message;
         }
 
@@ -40,7 +41,7 @@ public class MessageEvent extends ApplicationEvent {
         public String toString() {
             return new StringJoiner(", ", Event.class.getSimpleName() + "[", "]")
                     .add("login='" + login + "'")
-                    .add("message='" + message + "'")
+                    .add("message='" + message.getMessage() + "'")
                     .toString();
         }
 

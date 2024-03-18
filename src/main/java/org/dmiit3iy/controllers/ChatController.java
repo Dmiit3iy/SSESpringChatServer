@@ -10,7 +10,6 @@ import org.dmiit3iy.servise.ChatService;
 import org.dmiit3iy.servise.MessageService;
 import org.dmiit3iy.servise.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,40 +18,33 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @RestController
-@RequestMapping("/sse2")
+@RequestMapping("/sse/chat")
 public class ChatController implements ApplicationListener<MessageEvent> {
-
-    @Value("${user.id}")
-    private long id;
-    final private ChatService chatService;
-    @Autowired
-    //без нее ошибка Null Caused by: java.lang.NullPointerException: Cannot invoke "org.dmiit3iy.servise.UserService.get(long)" because "this.userService" is null
+    private ChatService chatService;
     private SseEmitters emitters;
+    private UserService userService;
+    private MessageService messageService;
 
     @Autowired
     public void setEmitters(SseEmitters emitters) {
         this.emitters = emitters;
     }
 
-    @Autowired //без нее ошибка Null Caused by:...
-    private UserService userService;
-
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
-    @Autowired //без нее ошибка Null Caused by:...
-    private MessageService messageService;
 
     @Autowired
     public void setMessageService(MessageService messageService) {
         this.messageService = messageService;
     }
 
-
-    public ChatController(ChatService chatService) {
+    @Autowired
+    public void setChatService(ChatService chatService) {
         this.chatService = chatService;
     }
 
@@ -61,29 +53,39 @@ public class ChatController implements ApplicationListener<MessageEvent> {
         chatService.start();
     }
 
-
-    @GetMapping(path = "/chat/${user.id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter getChatUsers(@RequestParam long idUser) {
-
-       User user= userService.get(id);
-        System.out.println(user);
+    @GetMapping(path = "/{idUser}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter getChatUsers(@PathVariable long idUser) {
+        User user = userService.get(idUser);
         return emitters.add(new SseEmitter(60000L), idUser);
     }
 
-    @Value("${user.id}")
-    @PostMapping(path = "message/${user.id}")
-    public ResponseEntity<ResponseResult<Message>> sendMessage(@RequestParam long idUser, @RequestParam String message) {
+    @PostMapping(path = "/message/{idUser}")
+    public ResponseEntity<ResponseResult<Message>> get(@PathVariable long idUser,
+                                                       @RequestBody Message message) {
         try {
-            User user = userService.get(idUser);
-            if (user == null) {
-                throw new IllegalArgumentException();
-            }
-            Message message1 = new Message(message);
+            messageService.add(message, idUser);
+            return new ResponseEntity<>(new ResponseResult<>(null, message), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new ResponseResult<>(e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
 
-            message1.setUser(user);
-            messageService.add(message1);
-            chatService.addMessage(message1);
-            return new ResponseEntity<>(new ResponseResult<>(null, message1), HttpStatus.OK);
+
+    @GetMapping
+    public ResponseEntity<ResponseResult<List<Message>>> get() {
+        try {
+            List<Message> messageList = messageService.get();
+            return new ResponseEntity<>(new ResponseResult<>(null, messageList), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new ResponseResult<>(e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/online")
+    private ResponseEntity<ResponseResult<List<User>>> getOnline() {
+        try {
+            List<User> userList = userService.getOnlineUsers();
+            return new ResponseEntity<>(new ResponseResult<>(null, userList), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseResult<>(e.getMessage(), null), HttpStatus.BAD_REQUEST);
         }

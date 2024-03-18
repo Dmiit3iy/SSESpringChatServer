@@ -35,11 +35,11 @@ public class SseEmitters {
     }
 
     public void send(Object obj) {
-        logger.info("Emitters current before deleting: {}",getOnlineEmitters());
+        logger.info("Emitters current before deleting: {}", getOnlineEmitters());
         List<SseEmitter> failedEmitters = new ArrayList<>();
         CopyOnWriteArrayList<SseEmitter> emittersOnLine = getOnlineEmitters();
         emittersOnLine.forEach(emitter -> {
-            //TODO вынести в отдельный поток отправку сообщения
+
             Thread thread = new Thread(() -> {
                 try {
                     emitter.send(obj);
@@ -53,7 +53,6 @@ public class SseEmitters {
         });
 
 
-     //   this.emitters.removeAll(failedEmitters);
         for (SseEmitter s: failedEmitters) {
             removeByEmitter(s);
         }

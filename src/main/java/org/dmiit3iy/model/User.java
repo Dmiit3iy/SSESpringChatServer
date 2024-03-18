@@ -23,7 +23,7 @@ public class User {
     private String login;
     @NonNull
     @Column(nullable = false)
-    @JsonIgnore
+
     private String password;
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
     @Cascade(value = org.hibernate.annotations.CascadeType.DELETE)

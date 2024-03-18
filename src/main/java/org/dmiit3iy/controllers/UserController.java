@@ -2,16 +2,13 @@ package org.dmiit3iy.controllers;
 
 import org.dmiit3iy.dto.ResponseResult;
 import org.dmiit3iy.model.User;
-import org.dmiit3iy.repository.SseEmitters;
 import org.dmiit3iy.servise.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @RestController
 @RequestMapping(path = "/user")
