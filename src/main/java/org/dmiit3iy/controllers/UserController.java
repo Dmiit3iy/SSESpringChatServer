@@ -53,16 +53,6 @@ public class UserController {
     }
 
 
-    @GetMapping("/online")
-    private ResponseEntity<ResponseResult<List<User>>> getOnline() {
-        try {
-            List<User> userList = userService.getOnlineUsers();
-            return new ResponseEntity<>(new ResponseResult<>(null, userList), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new ResponseResult<>(e.getMessage(), null), HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseResult<User>> delete(@PathVariable long id) {
 

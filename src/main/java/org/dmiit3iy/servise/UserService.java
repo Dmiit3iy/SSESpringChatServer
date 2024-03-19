@@ -9,5 +9,5 @@ public interface UserService {
     User get (long id);
     User getByLoginAndPassword(String login, String password);
     User delete(long id);
-    List<User> getOnlineUsers();
+
 }

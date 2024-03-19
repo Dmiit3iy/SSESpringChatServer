@@ -6,7 +6,7 @@ import org.dmiit3iy.event.MessageEvent;
 import org.dmiit3iy.model.Message;
 import org.dmiit3iy.model.User;
 import org.dmiit3iy.repository.SseEmitters;
-import org.dmiit3iy.servise.ChatService;
+
 import org.dmiit3iy.servise.MessageService;
 import org.dmiit3iy.servise.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/sse/chat")
 public class ChatController implements ApplicationListener<MessageEvent> {
-    private ChatService chatService;
+
     private SseEmitters emitters;
     private UserService userService;
     private MessageService messageService;
@@ -43,20 +43,10 @@ public class ChatController implements ApplicationListener<MessageEvent> {
         this.messageService = messageService;
     }
 
-    @Autowired
-    public void setChatService(ChatService chatService) {
-        this.chatService = chatService;
-    }
-
-    @PostConstruct
-    void init() {
-        chatService.start();
-    }
-
     @GetMapping(path = "/{idUser}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter getChatUsers(@PathVariable long idUser) {
         User user = userService.get(idUser);
-        return emitters.add(new SseEmitter(60000L), idUser);
+        return emitters.add(new SseEmitter(10000L), idUser);
     }
 
     @PostMapping(path = "/message/{idUser}")
@@ -70,22 +60,11 @@ public class ChatController implements ApplicationListener<MessageEvent> {
         }
     }
 
-
     @GetMapping
     public ResponseEntity<ResponseResult<List<Message>>> get() {
         try {
             List<Message> messageList = messageService.get();
             return new ResponseEntity<>(new ResponseResult<>(null, messageList), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new ResponseResult<>(e.getMessage(), null), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @GetMapping("/online")
-    private ResponseEntity<ResponseResult<List<User>>> getOnline() {
-        try {
-            List<User> userList = userService.getOnlineUsers();
-            return new ResponseEntity<>(new ResponseResult<>(null, userList), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseResult<>(e.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
